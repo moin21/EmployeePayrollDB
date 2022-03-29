@@ -84,7 +84,7 @@ Find Sum, Average, Min, max, and number of male and femal employee:
 	SELECT Gender, COUNT(Gender) FROM employee_payroll GROUP BY Gender;
     
   UC8:
-  Adding New Columns with Department and non null field and Defaule Address:
+  Adding New Columns with Department as non null field and Default Address:
   mysql> ALTER TABLE employee_payroll ADD Phone int, ADD Address varchar(50) DEFAULT 'Delhi', ADD Department varchar(50) NOT NULL;
 Query OK, 0 rows affected (0.04 sec)
 Records: 0  Duplicates: 0  Warnings: 0
@@ -97,3 +97,58 @@ mysql> select * from employee_payroll;
 |  2 | Albert Murphy   |   55000 | 2022-02-01 | NULL   |  NULL | Delhi   |            |
 +----+-----------------+---------+------------+--------+-------+---------+------------+
 2 rows in set (0.01 sec)
+
+UC9:
+Adding new columns Basic_Salary, Deductions, Taxable_Pay, Income_Tax, Net_Pay:
+mysql> ALTER TABLE employee_payroll ADD Basic_Pay int, ADD Deductions int, ADD Taxable_Pay int, ADD Income_Tax int, ADD Net_Pay int;
+Query OK, 0 rows affected (0.12 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee_payroll;
++----+-----------------+---------+------------+--------+-------+---------+------------+-----------+------------+-------------+------------+---------+
+| id | Name            | Salary  | Start_Date | Gender | Phone | Address | Department | Basic_Pay | Deductions | Taxable_Pay | Income_Tax | Net_Pay |
++----+-----------------+---------+------------+--------+-------+---------+------------+-----------+------------+-------------+------------+---------+
+|  1 | Moinuddin Asraf | 1110000 | 2022-03-01 | MALE   |  NULL | Delhi   |            |      NULL |       NULL |        NULL |       NULL |    NULL |
+|  2 | Albert Murphy   |   55000 | 2022-02-01 | NULL   |  NULL | Delhi   |            |      NULL |       NULL |        NULL |       NULL |    NULL |
++----+-----------------+---------+------------+--------+-------+---------+------------+-----------+------------+-------------+------------+---------+
+2 rows in set (0.00 sec)
+
+UC10:
+
+mysql> CREATE TABLE Department (department_id int PRIMARY KEY ,Name varchar(30),Department varchar(30) NOT NULL,employee_id int,FOREIGN KEY (employee_id) REFERENCES employee_payroll(id) );
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> desc Department;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| department_id | int         | NO   | PRI | NULL    |       |
+| Name          | varchar(30) | YES  |     | NULL    |       |
+| Department    | varchar(30) | NO   |     | NULL    |       |
+| employee_id   | int         | YES  | MUL | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+
+mysql> ALTER TABLE employee_payroll DROP COLUMN Department;
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO employee_payroll VALUES(4, 'Terissa', 750000, '2022-03-01', 'FEMALE', 123456, 'NY', 123456, 123, 123, 123, 123);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO department VALUES (2, 'Terissa', 'Marketing', 4);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> INSERT INTO department VALUES (1, 'Terissa', 'Sales', 4);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> SELECT * FROM employee_payroll LEFT JOIN department ON employee_payroll.id = department.employee_id;
++----+-----------------+---------+------------+--------+-----------+---------+-----------+------------+-------------+------------+---------+---------------+---------+------------+-------------+
+| id | Name            | Salary  | Start_Date | Gender | Phone     | Address | Basic_Pay | Deductions | Taxable_Pay | Income_Tax | Net_Pay | department_id | Name    | Department | employee_id |
++----+-----------------+---------+------------+--------+-----------+---------+-----------+------------+-------------+------------+---------+---------------+---------+------------+-------------+
+|  1 | Moinuddin Asraf | 1110000 | 2022-03-01 | MALE   |      NULL | Delhi   |      NULL |       NULL |        NULL |       NULL |    NULL |          NULL | NULL    | NULL       |        NULL |
+|  2 | Albert Murphy   |   55000 | 2022-02-01 | NULL   |      NULL | Delhi   |      NULL |       NULL |        NULL |       NULL |    NULL |          NULL | NULL    | NULL       |        NULL |
+|  4 | Terissa         |  350000 | 2021-03-21 | F      | 123456789 | US      |    123456 |        123 |         123 |        123 |     123 |             2 | Terissa | Marketing  |           4 |
+|  4 | Terissa         |  350000 | 2021-03-21 | F      | 123456789 | US      |    123456 |        123 |         123 |        123 |     123 |             1 | Terissa | Sales      |           4 |
++----+-----------------+---------+------------+--------+-----------+---------+-----------+------------+-------------+------------+---------+---------------+---------+------------+-------------+
+4 rows in set (0.00 sec)
